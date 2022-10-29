@@ -1,52 +1,84 @@
-import express from "express"
-import morgan from "morgan"
-import cors from "cors"
-import { PrismaClient } from "@prisma/client"
-import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
-const SECRET = "secret"
+import express from "express";
+import morgan from "morgan";
+import cors from "cors";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+const SECRET = "secret";
 
-const PORT = 1234
+const PORT = 1234;
 
 // Initialisation de Express 4
-const app = express()
+const app = express();
 
 // Activation de CORS pour les CORS...
-app.use(cors())
+app.use(cors());
 // Activation de Morgan pour les logs
-app.use(morgan("tiny"))
+app.use(morgan("tiny"));
 // Activation du raw (json)
-app.use(express.json())
+app.use(express.json());
 // Activation de x-wwww-form-urlencoded
 
-app.use(express.urlencoded({ extended: true }))
+app.use(express.urlencoded({ extended: true }));
 
 // Initialisation du client Prisma
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 app.get("/users", async (req, res) => {
-  const users = await prisma.user.findMany()
-  res.send(users)
-})
+  const users = await prisma.user.findMany();
+  res.send(users);
+});
 
 app.post("/signup", async (req, res) => {
   // Plus y a de sel plus le mdp sera dur à brute force
-  const salt = await bcrypt.genSalt(10)
+  // const salt = await bcrypt.genSalt(10)
+
   // Je gen un mdp crypté
-  const crypted_password = await bcrypt.hash(req.body.password, salt)
+  // const crypted_password = await bcrypt.hash(req.body.password, salt)
 
   const { id, email } = await prisma.user.create({
     data: {
       email: req.body.email,
-      password: crypted_password,
+      password: req.body.password,
+      role: req.body.role,
     },
-  })
+  });
   // Gérener un token
-  const access_token = jwt.sign({ id }, SECRET, { expiresIn: "3 hours" })
+  const access_token = jwt.sign({ id }, SECRET, { expiresIn: "3 hours" });
   // Envoyer le token avec d'autres infos en bonus
-  res.send({ id, email, token: access_token })
-})
+  res.send({ id, email, token: access_token });
+});
+
+app.post("/login", async (req, res) => {
+  // Plus y a de sel plus le mdp sera dur à brute force
+  // const salt = await bcrypt.genSalt(10)
+
+  // Je gen un mdp crypté
+  // const crypted_password = await bcrypt.hash(req.body.password, salt)
+
+  const user = await prisma.user.findUnique({
+    where: { email: req.body.email },
+  });
+
+  if (!user) {
+    res.statusCode = 401;
+    res.send({ message: "No signed up user with this email" });
+    return;
+  }
+
+  const { id, email, password } = user;
+
+  if (password === req.body.password) {
+    // Gérener un token
+    const access_token = jwt.sign({ id }, SECRET, { expiresIn: "3 hours" });
+    // Envoyer le token avec d'autres infos en bonus
+    res.send({ id, email, token: access_token });
+  } else {
+    res.statusCode = 401;
+    res.send({ message: "Wrong password" });
+  }
+});
 
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`)
-})
+  console.log(`Server is running on port ${PORT}.`);
+});
