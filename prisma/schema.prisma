@@ -10,10 +10,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Staff {
   id       Int    @id @default(autoincrement())
   email    String @unique
   password String
-  role     String @default("STRUCTURE")
+  role     String @default("STAFF")
 }
 
+model Partner {
+  id         Int         @id @default(autoincrement())
+  email      String      @unique
+  password   String
+  city       String      @unique
+  structures Structure[]
+  active     Boolean     @default(false)
+  role       String      @default("PARTNER")
+}
+
+model Structure {
+  id              Int             @id @default(autoincrement())
+  email           String          @unique
+  password        String
+  street          String          @unique
+  partner         Partner         @relation(fields: [partnerId], references: [id])
+  partnerId       Int
+  functionalities Functionality[]
+  active          Boolean         @default(false)
+  role            String          @default("STRUCTURE")
+}
+
+model Functionality {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique
+  structures Structure[]
+  active     Boolean     @default(false)
+}
