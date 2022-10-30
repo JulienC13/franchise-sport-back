@@ -57,7 +57,7 @@ app.post("/login", async (req, res) => {
   // const crypted_password = await bcrypt.hash(req.body.password, salt)
 
   const user = await prisma.user.findUnique({
-    where: { email: req.body.email },
+    where: { email: req.body.email }, // explication ?
   });
 
   if (!user) {
@@ -66,7 +66,7 @@ app.post("/login", async (req, res) => {
     return;
   }
 
-  const { id, email, password } = user;
+  const { id, email, password } = user; 
 
   if (password === req.body.password) {
     // Gérener un token

@@ -16,3 +16,4 @@ model User {
   password String
   role     String @default("STRUCTURE")
 }
+
