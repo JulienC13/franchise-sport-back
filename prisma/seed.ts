@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import { PrismaClient } from "@prisma/client"
+const prisma = new PrismaClient()
 
 async function main() {
   // The only Staff member
@@ -8,18 +8,30 @@ async function main() {
       email: "staff@ob.io",
       password: "123456",
     },
-  });
+  })
 
   // Functionalities
   const newsletter = await prisma.functionality.create({
     data: { name: "Newsletter" },
-  });
+  })
   const door = await prisma.functionality.create({
     data: { name: "Porte" },
-  });
+  })
   const shower = await prisma.functionality.create({
     data: { name: "Douche" },
-  });
+  })
+
+  const functionalities = [
+    {
+      id: door.id,
+    },
+    {
+      id: newsletter.id,
+    },
+    {
+      id: shower.id,
+    },
+  ]
 
   const lille = await prisma.partner.create({
     data: {
@@ -34,14 +46,7 @@ async function main() {
             password: "123456",
             active: true,
             functionalities: {
-              connect: [
-                {
-                  id: door.id,
-                },
-                {
-                  id: newsletter.id,
-                },
-              ],
+              connect: functionalities,
             },
           },
           {
@@ -50,24 +55,20 @@ async function main() {
             password: "123456",
             active: false,
             functionalities: {
-              connect: [
-                {
-                  id: shower.id,
-                },
-              ],
+              connect: functionalities,
             },
           },
         ],
       },
     },
-  });
+  })
 }
 main()
   .then(async () => {
-    await prisma.$disconnect();
+    await prisma.$disconnect()
   })
   .catch(async (e) => {
-    console.error(e);
-    await prisma.$disconnect();
-    process.exit(1);
-  });
+    console.error(e)
+    await prisma.$disconnect()
+    process.exit(1)
+  })

@@ -56,9 +56,6 @@ CREATE UNIQUE INDEX "Partner_city_key" ON "Partner"("city");
 CREATE UNIQUE INDEX "Structure_email_key" ON "Structure"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Structure_street_key" ON "Structure"("street");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Functionality_name_key" ON "Functionality"("name");
 
 -- CreateIndex

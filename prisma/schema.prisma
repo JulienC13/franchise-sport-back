@@ -31,7 +31,7 @@ model Structure {
   id              Int             @id @default(autoincrement())
   email           String          @unique
   password        String
-  street          String          @unique
+  street          String
   partner         Partner         @relation(fields: [partnerId], references: [id])
   partnerId       Int
   functionalities Functionality[]
